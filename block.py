@@ -52,7 +52,7 @@ def detectMarkerFromVideo(_file):
     dt = 1/24 #sec
     t  = 0.0
     
-    fi = open(r"/home/wrl/Documents/python/coord.txt", 'w')
+    fi = open(r"./coord.csv", 'w')
     cap=cv2.VideoCapture(_file)
 
     #잘 열렸는지 확인
@@ -85,12 +85,12 @@ def detectMarkerFromVideo(_file):
     #width : 넓이
     #height : 높이
        
-
+    dic = {}
     while(True):
         # Capture frame-by-frame
         ret, frame = cap.read()
         frame = cv2.flip(frame, -1)
-        dic = {}
+        # dic = {}
         lstID = [3,1,2,7,11,12]
         if ret:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -101,22 +101,33 @@ def detectMarkerFromVideo(_file):
             # print(frame_markers[0][0][0])
             # plt.figure()
             time = cap.get(cv2.CAP_PROP_POS_MSEC)
-            for id in ids:
-                # print(id[0])
-                
-                dic[f"id{id[0]}"]=[time, id[0],frame_markers[0][id[0]][0],frame_markers[0][id[0]][1],frame_markers[0][id[0]][2]]
-                # print(dic)
-            for i in lstID:
-                if f"id{i}" in dic:
-                    print(f"id{i} is")
-                    print(dic[f"id{ids[i][0]}"])
-                    # fi.write( dic[f"id{ids[i][0]}"] + '\n' )
-                else:
-                    print(f"id{i} is not")
-                    fi.write( f"{time}, {i}, null, null, null" +'\n' )     
-            # print(f"id{ids[0][0]}")
-            #print( str(time)+" : "+str(ids) +" : "+str(corners))
-            fi.write( str(time)+" : "+str(ids) +" : "+str(corners)+'\n')
+            # print(time)
+            
+            for id in lstID:
+                # if id in ids: 
+                if id == 1:  
+                    print(corners)                               
+                    dic[f"id{id}"]=[time, id,frame_markers[0][id][0],frame_markers[0][id][1],frame_markers[0][id][2]]
+                    fi.write(f"{time}, {id},{frame_markers[0][id][0]},{frame_markers[0][id][1]},{frame_markers[0][id][2]}"+"\n")
+                    # print(f"{time}, {id},{frame_markers[0][id][0]},{frame_markers[0][id][1]},{frame_markers[0][id][2]}"+"\n")
+                # if f"id{id[0]}" in dic:
+                #     # print(f"id{id[0]}")
+                # else:
+                #     pass
+            # for key in dic:
+            #     print key
+            #     if f"id{i}" in dic:
+            #         # print(f"id{i} is")
+            #         print(dic[f"id{ids[i][0]}"])
+            #         # fi.write( dic[f"id{ids[i][0]}"] + '\n' )
+            #     else:
+            #         print(f"id{i} is not")
+            #         fi.write( f"{time}, {i}, null, null, null" +'\n' )     
+            # # print(f"id{ids[0][0]}")
+            # #print( str(time)+" : "+str(ids) +" : "+str(corners))
+                # fi.write(dic[f"id{id[0]}"])
+                # fi.write( str(time)+" : "+str(ids) +" : "+str(corners)+'\n' )
+            
             cv2.imshow("Output",frame_markers)
             
             # 인식된 이미지 파일로 저장
@@ -124,6 +135,7 @@ def detectMarkerFromVideo(_file):
 
         else:
             break
+        # print(dic)
         key = cv2.waitKey(1) & 0xFF
         # if the `q` key was pressed, break from the loop
         if key == ord("q"):
