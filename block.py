@@ -14,21 +14,23 @@ def createMarker(_data):
     fig = plt.figure()
     nx = 4
     ny = 3
-    for i in range(1, nx*ny+1):
-        ax = fig.add_subplot(ny,nx, i)
-        img = aruco.drawMarker(aruco_dict,i, 700)
-        plt.imshow(img, cmap = mpl.cm.gray, interpolation = "nearest")
+    for i in range(1, nx * ny + 1):
+        ax = fig.add_subplot(ny, nx, i)
+        img = aruco.drawMarker(aruco_dict, i, 700)
+        plt.imshow(img, cmap=mpl.cm.gray, interpolation="nearest")
         ax.axis("off")
 
-    plt.savefig(_data+"\\markers.pdf")
+    plt.savefig(_data + "\\markers.pdf")
     plt.show()
+
 
 ### Read video
 def readVideo(_file):
     import cv2
-    cap=cv2.VideoCapture(_file)
 
-    while(True):
+    cap = cv2.VideoCapture(_file)
+
+    while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
         if ret:
@@ -43,72 +45,84 @@ def readVideo(_file):
     cap.release()
     cv2.destroyAllWindows()
 
+
 ### Detect from video source
 def detectMarkerFromVideo(_file):
     import cv2
     from cv2 import aruco
     import matplotlib.pyplot as plt
 
-    dt = 1/24 #sec
-    t  = 0.0
-    
-    fi = open(r"./coord.csv", 'w')
-    cap=cv2.VideoCapture(_file)
+    dt = 1 / 24  # sec
+    t = 0.0
 
-    #잘 열렸는지 확인
+    fi = open(r"./coord.csv", "w")
+    cap = cv2.VideoCapture(_file)
+
+    # 잘 열렸는지 확인
     if cap.isOpened() == False:
-        print ('Can\'t open the video (%d)' % (_file))
+        print("Can't open the video (%d)" % (_file))
         exit()
 
-    #재생할 파일의 넓이 얻기
+    # 재생할 파일의 넓이 얻기
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-    #재생할 파일의 높이 얻기
+    # 재생할 파일의 높이 얻기
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    #재생할 파일의 프레임 레이트 얻기
+    # 재생할 파일의 프레임 레이트 얻기
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # print('width {0}, height {1}, fps {2}'.format(width, height, fps))
 
-    #XVID가 제일 낫다고 함.
-    #linux 계열 DIVX, XVID, MJPG, X264, WMV1, WMV2.
-    #windows 계열 DIVX
-    #저장할 비디오 코덱
-    fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    #저장할 파일 이름
-    filename = 'sprite_with_face_detect.avi'
+    # XVID가 제일 낫다고 함.
+    # linux 계열 DIVX, XVID, MJPG, X264, WMV1, WMV2.
+    # windows 계열 DIVX
+    # 저장할 비디오 코덱
+    fourcc = cv2.VideoWriter_fourcc(*"DIVX")
+    # 저장할 파일 이름
+    filename = "sprite_with_face_detect.avi"
 
-    #파일 stream 생성
+    # 파일 stream 생성
     out = cv2.VideoWriter(filename, fourcc, fps, (int(width), int(height)))
-    #filename : 파일 이름
-    #fourcc : 코덱
-    #fps : 초당 프레임 수
-    #width : 넓이
-    #height : 높이
-       
+    # filename : 파일 이름
+    # fourcc : 코덱
+    # fps : 초당 프레임 수
+    # width : 넓이
+    # height : 높이
+
     dic = {}
-    while(True):
+    while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
         frame = cv2.flip(frame, -1)
         # dic = {}
-        lstID = [3,1,2,7,11,12]
+        lstID = [3, 1, 2, 7, 11, 12]
         if ret:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
-            parameters =  aruco.DetectorParameters_create()
-            corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+            parameters = aruco.DetectorParameters_create()
+            corners, ids, rejectedImgPoints = aruco.detectMarkers(
+                gray, aruco_dict, parameters=parameters
+            )
             frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
             # print(frame_markers[0][0][0])
             # plt.figure()
             time = cap.get(cv2.CAP_PROP_POS_MSEC)
             # print(time)
-            
+
             for id in lstID:
-                # if id in ids: 
-                if id == 1:  
-                    print(corners)                               
-                    dic[f"id{id}"]=[time, id,frame_markers[0][id][0],frame_markers[0][id][1],frame_markers[0][id][2]]
-                    fi.write(f"{time}, {id},{frame_markers[0][id][0]},{frame_markers[0][id][1]},{frame_markers[0][id][2]}"+"\n")
+                # if id in ids:
+                if id == 1:
+                    print(corners)
+                    dic[f"id{id}"] = [
+                        time,
+                        id,
+                        frame_markers[0][id][0],
+                        frame_markers[0][id][1],
+                        frame_markers[0][id][2],
+                    ]
+                    fi.write(
+                        f"{time}, {id},{frame_markers[0][id][0]},{frame_markers[0][id][1]},{frame_markers[0][id][2]}"
+                        + "\n"
+                    )
                     # print(f"{time}, {id},{frame_markers[0][id][0]},{frame_markers[0][id][1]},{frame_markers[0][id][2]}"+"\n")
                 # if f"id{id[0]}" in dic:
                 #     # print(f"id{id[0]}")
@@ -122,14 +136,14 @@ def detectMarkerFromVideo(_file):
             #         # fi.write( dic[f"id{ids[i][0]}"] + '\n' )
             #     else:
             #         print(f"id{i} is not")
-            #         fi.write( f"{time}, {i}, null, null, null" +'\n' )     
+            #         fi.write( f"{time}, {i}, null, null, null" +'\n' )
             # # print(f"id{ids[0][0]}")
             # #print( str(time)+" : "+str(ids) +" : "+str(corners))
-                # fi.write(dic[f"id{id[0]}"])
-                # fi.write( str(time)+" : "+str(ids) +" : "+str(corners)+'\n' )
-            
-            cv2.imshow("Output",frame_markers)
-            
+            # fi.write(dic[f"id{id[0]}"])
+            # fi.write( str(time)+" : "+str(ids) +" : "+str(corners)+'\n' )
+
+            cv2.imshow("Output", frame_markers)
+
             # 인식된 이미지 파일로 저장
             out.write(frame_markers)
 
@@ -142,9 +156,10 @@ def detectMarkerFromVideo(_file):
             break
     fi.close()
     cap.release()
-    #저장 파일 종료
+    # 저장 파일 종료
     out.release()
     cv2.destroyAllWindows()
+
 
 ### Detect from realtime camera
 def detectMarkerFromCamera():
@@ -152,19 +167,21 @@ def detectMarkerFromCamera():
     from cv2 import aruco
     import matplotlib.pyplot as plt
 
-    cap=cv2.VideoCapture(0)
-    while(True):
+    cap = cv2.VideoCapture(0)
+    while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
         if ret:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
-            parameters =  aruco.DetectorParameters_create()
-            corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+            parameters = aruco.DetectorParameters_create()
+            corners, ids, rejectedImgPoints = aruco.detectMarkers(
+                gray, aruco_dict, parameters=parameters
+            )
             frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
             # plt.figure()
-            print(str(ids) +",  "+str(corners))
-            cv2.imshow("Output",frame_markers)
+            print(str(ids) + ",  " + str(corners))
+            cv2.imshow("Output", frame_markers)
 
         else:
             break
@@ -175,8 +192,9 @@ def detectMarkerFromCamera():
     cap.release()
     cv2.destroyAllWindows()
 
+
 ### Overlay marker ID and video
-def overlay( _video ):
+def overlay(_video):
     import cv2
     from cv2 import aruco
     import time
@@ -184,24 +202,27 @@ def overlay( _video ):
     dict_aruco = aruco.Dictionary_get(aruco.DICT_6X6_250)
     parameters = aruco.DetectorParameters_create()
 
-    cap = cv2.VideoCapture( _video )
+    cap = cv2.VideoCapture(_video)
 
     try:
         while True:
             ret, frame = cap.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-            corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, dict_aruco, parameters=parameters)
+            corners, ids, rejectedImgPoints = aruco.detectMarkers(
+                gray, dict_aruco, parameters=parameters
+            )
 
             frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
-            cv2.imshow('frame', frame_markers)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.imshow("frame", frame_markers)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-        cv2.destroyWindow('frame')
+        cv2.destroyWindow("frame")
         cap.release()
     except KeyboardInterrupt:
-        cv2.destroyWindow('frame')
+        cv2.destroyWindow("frame")
         cap.release()
+
 
 # def quad_area(data):
 #     import numpy as np

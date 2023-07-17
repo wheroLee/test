@@ -4,6 +4,7 @@ from cv2 import aruco
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
+
 # #%% create marker
 
 # aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
@@ -23,18 +24,20 @@ import pandas as pd
 # #plt.show()
 
 
-#%% open image
+# %% open image
 frame = cv2.imread("/home/ubun/Documents/python/aruco_photo2.jpg")
 # plt.figure()
 # plt.imshow(frame)
-#plt.show()
+# plt.show()
 
 
-#%% 
+# %%
 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
-parameters =  aruco.DetectorParameters_create()
-corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+parameters = aruco.DetectorParameters_create()
+corners, ids, rejectedImgPoints = aruco.detectMarkers(
+    gray, aruco_dict, parameters=parameters
+)
 frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
 # print("corners          : " + str(corners))
 # print("ids              : " + str(ids))
@@ -42,20 +45,20 @@ frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
 # print("frame_markers    : " + str(frame_markers))
 
 ### If marker of num_id is detected ###
-if num_id in np.ravel(ids) :
-    index = np.where(ids == num_id)[0][0] #Extract index of num_id
+if num_id in np.ravel(ids):
+    index = np.where(ids == num_id)[0][0]  # Extract index of num_id
     cornerUL = corners[index][0][0]
     cornerUR = corners[index][0][1]
     cornerBR = corners[index][0][2]
     cornerBL = corners[index][0][3]
 
-    center = [ (cornerUL[0]+cornerBR[0])/2 , (cornerUL[1]+cornerBR[1])/2 ]
+    center = [(cornerUL[0] + cornerBR[0]) / 2, (cornerUL[1] + cornerBR[1]) / 2]
 
-    print('Upper left : {}'.format(cornerUL))
-    print('Upper right : {}'.format(cornerUR))
-    print('Lower right : {}'.format(cornerBR))
-    print('Lower Left : {}'.format(cornerBL))
-    print('Center : {}'.format(center))
+    print("Upper left : {}".format(cornerUL))
+    print("Upper right : {}".format(cornerUR))
+    print("Lower right : {}".format(cornerBR))
+    print("Lower Left : {}".format(cornerBL))
+    print("Center : {}".format(center))
 
     print(corners[index])
 
@@ -72,7 +75,7 @@ if num_id in np.ravel(ids) :
 # plt.legend()
 # plt.show()
 
-# # %% 
+# # %%
 # import pip
 # from imutils.video import VideoStream
 # import argparse
